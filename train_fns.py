@@ -22,12 +22,10 @@ def GAN_training_function(G, D, GD, z_, y_, ema, state_dict, config):
     G.optim.zero_grad()
     D.optim.zero_grad()
     # How many chunks to split x and y into?
-    x = torch.split(x, config['batch_size'])
     if config['colorization']:
       y = 0.3 * x[:, 0, :, :] + 0.59 * x[:, 1, :, :] + 0.11 * x[:, 2, :, :]
-      y = torch.split(y, config['batch_size'])
-    else:
-      y = torch.split(y, config['batch_size'])
+    x = torch.split(x, config['batch_size'])
+    y = torch.split(y, config['batch_size'])
     counter = 0
 
     # Optionally toggle D and G's "require_grad"
