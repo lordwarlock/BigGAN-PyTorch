@@ -1,7 +1,10 @@
 from Pix2PixUNet import UnetSkipConnectionBlock
 import torch.nn as nn
+from torch.nn import init
+import torch.optim as optim
 from BigGAN import Discriminator
 from BigGAN import G_D
+import layers
 class Generator(nn.Module):
   def __init__(self, G_ch=64, dim_z=128, bottom_width=4, resolution=128,
                G_kernel_size=3, G_attn='64', n_classes=1000,
@@ -55,9 +58,10 @@ class Generator(nn.Module):
     self.fp16 = G_fp16
     # Architecture dict
 
-    self.dim_z = 128 * 128 * 3
+    self.dim_z = 128 * 128
 
     # Prepare model
+    self.shared = layers.identity()
     input_nc = 1
     output_nc = 3
     num_downs = 7
@@ -122,5 +126,5 @@ class Generator(nn.Module):
   # G.shared in this forward function, it would be harder to handle.
   def forward(self, z, y):
     """Standard forward"""
-    z = z.view(-1, 3, 128, 128)
+    z = z.view(-1, 1, 128, 128)
     return self.model(z)
