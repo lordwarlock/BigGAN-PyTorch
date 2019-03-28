@@ -170,7 +170,8 @@ def run(config):
   sample = functools.partial(utils.sample,
                               G=(G_ema if config['ema'] and config['use_ema']
                                  else G),
-                              z_=z_, y_=y_, config=config)
+                              z_=z_, y_=y_, config=config,
+                              loader = loaders[1] if config['colorization'] else None)
 
   print('Beginning training at epoch %d...' % state_dict['epoch'])
   # Train for specified number of epochs, although we mostly track G iterations.

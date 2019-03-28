@@ -579,12 +579,17 @@ def get_data_loaders(dataset, dataset_root=None, augment=False, batch_size=64,
     sampler = MultiEpochSampler(train_set, num_epochs, start_itr, batch_size)
     train_loader = DataLoader(train_set, batch_size=batch_size,
                               sampler=sampler, **loader_kwargs)
+    sampl_loader = DataLoader(train_set, batch_size=batch_size,
+                              sampler=sampler, **loader_kwargs)
   else:
     loader_kwargs = {'num_workers': num_workers, 'pin_memory': pin_memory,
                      'drop_last': drop_last} # Default, drop last incomplete batch
     train_loader = DataLoader(train_set, batch_size=batch_size,
                               shuffle=shuffle, **loader_kwargs)
+    sampl_loader = DataLoader(train_set, batch_size=batch_size,
+                              shuffle=shuffle, **loader_kwargs)
   loaders.append(train_loader)
+  loaders.append(sampl_loader)
   return loaders
 
 
@@ -867,10 +872,14 @@ def progress(items, desc='', total=None, min_delay=0.1, displaytype='s1k'):
 
 
 # Sample function for use with inception metrics
-def sample(G, z_, y_, config):
+def sample(G, z_, y_, config, loader=None):
   with torch.no_grad():
     z_.sample_()
     y_.sample_()
+    if config['colorization']:
+      x, _ = next(iter(loader))
+      x.to('cuda')
+      z_ = prepare_conditional_z(z_, x)
     if config['parallel']:
       G_z =  nn.parallel.data_parallel(G, (z_, G.shared(y_)))
     else:
@@ -1205,4 +1214,4 @@ def prepare_conditional_z(z, x):
   x = torch.unsqueeze(x, 1)
   z = z.view(-1, 1, 128, 128)
   z = torch.cat((z, x[:z.shape[0], :]), 1)
-  return
+  return z
