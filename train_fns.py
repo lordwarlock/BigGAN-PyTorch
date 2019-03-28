@@ -19,7 +19,6 @@ def dummy_training_function():
 
 def GAN_training_function(G, D, GD, z_, y_, ema, state_dict, config):
   def train(x, y):
-    nonlocal z_
     G.optim.zero_grad()
     D.optim.zero_grad()
     # How many chunks to split x and y into?
@@ -43,12 +42,14 @@ def GAN_training_function(G, D, GD, z_, y_, ema, state_dict, config):
       for accumulation_index in range(config['num_D_accumulations']):
         z_.sample_()
         if config['colorization']:
-          z_ = z_.view(-1, 1, 128, 128)
-          z_ = torch.cat((z_, gray_x[counter]), 1)
+          bwz = z_.view(-1, 1, 128, 128)
+          bwz = torch.cat((bwz, gray_x[counter]), 1)
           y_ = y[counter]
         else:
           y_.sample_()
-        D_fake, D_real = GD(z_[:config['batch_size']], y_[:config['batch_size']],
+        D_fake, D_real = GD(bwz if config['colorization'] \
+                            else z_[:config['batch_size']],
+                            y_[:config['batch_size']],
                             x[counter], y[counter], train_G=False,
                             split_D=config['split_D'])
 
@@ -79,12 +80,13 @@ def GAN_training_function(G, D, GD, z_, y_, ema, state_dict, config):
     for accumulation_index in range(config['num_G_accumulations']):
       z_.sample_()
       if config['colorization']:
-        z_ = z_.view(-1, 1, 128, 128)
-        z_ = torch.cat((z_, gray_xx[counter]), 1)
+        bwz = z_.view(-1, 1, 128, 128)
+        bwz = torch.cat((bwz, gray_xx[counter]), 1)
         y_ = yy
       else:
         y_.sample_()
-      D_fake = GD(z_, y_, train_G=True, split_D=config['split_D'])
+      D_fake = GD(bwz if config['colorization'] else z_,
+                  y_, train_G=True, split_D=config['split_D'])
       G_loss = losses.generator_loss(D_fake) / float(config['num_G_accumulations'])
       G_loss.backward()
 
