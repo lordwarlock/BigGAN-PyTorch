@@ -127,6 +127,4 @@ class Generator(nn.Module):
   # G.shared in this forward function, it would be harder to handle.
   def forward(self, z, y):
     """Standard forward"""
-    z = z.view(-1, 1, 128, 128)
-    z = torch.cat((z, y), 1)
     return self.model(z)

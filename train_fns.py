@@ -23,10 +23,13 @@ def GAN_training_function(G, D, GD, z_, y_, ema, state_dict, config):
     D.optim.zero_grad()
     # How many chunks to split x and y into?
     if config['colorization']:
-      y = 0.3 * x[:, 0, :, :] + 0.59 * x[:, 1, :, :] + 0.11 * x[:, 2, :, :]
-      y = torch.unsqueeze(y, 1)
+      gray_x = 0.3 * x[:, 0, :, :] + 0.59 * x[:, 1, :, :] + 0.11 * x[:, 2, :, :]
+      gray_x = torch.unsqueeze(gray_x, 1)
+      gray_xx = gray_x
+      yy = y
     x = torch.split(x, config['batch_size'])
     y = torch.split(y, config['batch_size'])
+    gray_x = torch.split(gray_x, config['batch_size'])
     counter = 0
 
     # Optionally toggle D and G's "require_grad"
@@ -39,6 +42,8 @@ def GAN_training_function(G, D, GD, z_, y_, ema, state_dict, config):
       for accumulation_index in range(config['num_D_accumulations']):
         z_.sample_()
         if config['colorization']:
+          z_ = z_.view(-1, 1, 128, 128)
+          z_ = torch.cat((z_, gray_x[counter]), 1)
           y_ = y[counter]
         else:
           y_.sample_()
@@ -73,7 +78,9 @@ def GAN_training_function(G, D, GD, z_, y_, ema, state_dict, config):
     for accumulation_index in range(config['num_G_accumulations']):
       z_.sample_()
       if config['colorization']:
-        y_ = y
+        z_ = z_.view(-1, 1, 128, 128)
+        z_ = torch.cat((z_, gray_xx[counter]), 1)
+        y_ = yy
       else:
         y_.sample_()
       D_fake = GD(z_, y_, train_G=True, split_D=config['split_D'])
