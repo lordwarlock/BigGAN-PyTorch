@@ -156,6 +156,7 @@ def run(config):
     fixed_x = 0.3 * fixed_x[:, 0, :, :] + \
                0.59 * fixed_x[:, 1, :, :] + \
                0.11 * fixed_x[:, 2, :, :]
+    fixed_x = torch.unsqueeze(fixed_x, 1)
     fixed_z = fixed_z.view(-1, 1, 128, 128)
     fixed_z = torch.cat((fixed_z, fixed_x[:fixed_z.shape[0], :]), 1)
   # Loaders are loaded, prepare the training function
