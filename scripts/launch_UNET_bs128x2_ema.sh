@@ -12,3 +12,4 @@ python train.py \
 --G_eval_mode \
 --test_every 2000 --save_every 1000 --num_best_copies 5 --num_save_copies 2 --seed 0 \
 --name_suffix UNET_ema \
+--colorization \
