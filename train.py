@@ -151,6 +151,7 @@ def run(config):
   ### For BW->RGB TASK ###
   if config['colorization']:
     for fixed_x, fixed_y in loaders[0]:
+      fixed_x, fixed_y = fixed_x.to(device), fixed_y.to(device)
       break
     fixed_x = 0.3 * fixed_x[:, 0, :, :] + \
                0.59 * fixed_x[:, 1, :, :] + \
