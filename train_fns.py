@@ -81,7 +81,7 @@ def GAN_training_function(G, D, GD, z_, y_, ema, state_dict, config):
       z_.sample_()
       if config['colorization']:
         bwz = z_.view(-1, 1, 128, 128)
-        bwz = torch.cat((bwz, gray_xx[counter]), 1)
+        bwz = torch.cat((bwz, gray_xx), 1)
         y_ = yy
       else:
         y_.sample_()
