@@ -1196,3 +1196,13 @@ class Adam16(Optimizer):
         p.data = state['fp32_p'].half()
 
     return loss
+
+def prepare_conditional_z(z, x):
+  #just for BW->RGB now
+  x = 0.3 * x[:, 0, :, :] + \
+      0.59 * x[:, 1, :, :] + \
+      0.11 * x[:, 2, :, :]
+  x = torch.unsqueeze(x, 1)
+  z = z.view(-1, 1, 128, 128)
+  z = torch.cat((z, x[:z.shape[0], :]), 1)
+  return

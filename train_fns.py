@@ -149,7 +149,10 @@ def save_and_sample(G, D, G_ema, z_, y_, fixed_z, fixed_y,
   torchvision.utils.save_image(fixed_Gz.float().cpu(), image_filename,
                              nrow=int(fixed_Gz.shape[0] **0.5), normalize=True)
   # For now, every time we save, also save sample sheets
-  utils.sample_sheet(which_G,
+  if config['colorization']:
+    pass#not support for now, hard to add x into it
+  else:
+    utils.sample_sheet(which_G,
                      classes_per_sheet=utils.classes_per_sheet_dict[config['dataset']],
                      num_classes=config['n_classes'],
                      samples_per_class=10, parallel=config['parallel'],
