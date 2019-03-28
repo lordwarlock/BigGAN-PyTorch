@@ -24,6 +24,7 @@ def GAN_training_function(G, D, GD, z_, y_, ema, state_dict, config):
     # How many chunks to split x and y into?
     if config['colorization']:
       y = 0.3 * x[:, 0, :, :] + 0.59 * x[:, 1, :, :] + 0.11 * x[:, 2, :, :]
+      y = torch.unsqueeze(y, 1)
     x = torch.split(x, config['batch_size'])
     y = torch.split(y, config['batch_size'])
     counter = 0
