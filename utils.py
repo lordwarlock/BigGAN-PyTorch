@@ -878,7 +878,7 @@ def sample(G, z_, y_, config, loader=None):
     y_.sample_()
     if config['colorization']:
       x, _ = next(iter(loader))
-      x.to('cuda')
+      x = x.to('cuda')
       z_ = prepare_conditional_z(z_, x)
     if config['parallel']:
       G_z =  nn.parallel.data_parallel(G, (z_, G.shared(y_)))
