@@ -62,7 +62,7 @@ class Generator(nn.Module):
 
     # Prepare model
     self.shared = layers.identity()
-    input_nc = 1
+    input_nc = 2
     output_nc = 3
     num_downs = 7
     ngf=64
@@ -106,8 +106,8 @@ class Generator(nn.Module):
   def init_weights(self):
     self.param_count = 0
     for module in self.modules():
-      if (isinstance(module, nn.Conv2d) 
-          or isinstance(module, nn.Linear) 
+      if (isinstance(module, nn.Conv2d)
+          or isinstance(module, nn.Linear)
           or isinstance(module, nn.Embedding)):
         if self.init == 'ortho':
           init.orthogonal_(module.weight)
@@ -127,4 +127,5 @@ class Generator(nn.Module):
   def forward(self, z, y):
     """Standard forward"""
     z = z.view(-1, 1, 128, 128)
+    z = torch.cat((z, y), 1)
     return self.model(z)
