@@ -150,7 +150,7 @@ def save_and_sample(G, D, G_ema, z_, y_, fixed_z, fixed_y,
                              nrow=int(fixed_Gz.shape[0] **0.5), normalize=True)
   # For now, every time we save, also save sample sheets
   if config['colorization']:
-    pass#not support for now, hard to add x into it
+    pass#not support for now, not trivial to add x into it
   else:
     utils.sample_sheet(which_G,
                      classes_per_sheet=utils.classes_per_sheet_dict[config['dataset']],
@@ -160,9 +160,9 @@ def save_and_sample(G, D, G_ema, z_, y_, fixed_z, fixed_y,
                      experiment_name=experiment_name,
                      folder_number=state_dict['itr'],
                      z_=z_)
-  # Also save interp sheets
-  for fix_z, fix_y in zip([False, False, True], [False, True, False]):
-    utils.interp_sheet(which_G,
+    # Also save interp sheets
+    for fix_z, fix_y in zip([False, False, True], [False, True, False]):
+      utils.interp_sheet(which_G,
                        num_per_sheet=16,
                        num_midpoints=8,
                        num_classes=config['n_classes'],
