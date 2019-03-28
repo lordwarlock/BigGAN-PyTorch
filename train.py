@@ -148,6 +148,15 @@ def run(config):
                                        fp16=config['G_fp16'])
   fixed_z.sample_()
   fixed_y.sample_()
+  ### For BW->RGB TASK ###
+  if config['colorization']:
+    for fixed_x, fixed_y in loaders[0]:
+      break
+     fixed_x = 0.3 * fixed_x[:, 0, :, :] + \
+               0.59 * fixed_x[:, 1, :, :] + \
+               0.11 * fixed_x[:, 2, :, :]
+    fixed_z = fixed_z.view(-1, 1, 128, 128)
+    fixed_z = torch.cat((fixed_z, fixed_x[:fixed_z.shape[0], :]), 1)
   # Loaders are loaded, prepare the training function
   if config['which_train_fn'] == 'GAN':
     train = train_fns.GAN_training_function(G, D, GD, z_, y_,
