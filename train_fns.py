@@ -25,8 +25,6 @@ def GAN_training_function(G, D, GD, z_, y_, ema, state_dict, config):
     if config['colorization']:
       gray_x = 0.3 * x[:, 0, :, :] + 0.59 * x[:, 1, :, :] + 0.11 * x[:, 2, :, :]
       gray_x = torch.unsqueeze(gray_x, 1)
-      gray_xx = gray_x
-      yy = y
     x = torch.split(x, config['batch_size'])
     y = torch.split(y, config['batch_size'])
     gray_x = torch.split(gray_x, config['batch_size'])
@@ -77,12 +75,14 @@ def GAN_training_function(G, D, GD, z_, y_, ema, state_dict, config):
     G.optim.zero_grad()
 
     # If accumulating gradients, loop multiple times
+    counter = 0
     for accumulation_index in range(config['num_G_accumulations']):
       z_.sample_()
       if config['colorization']:
         bwz = z_.view(-1, 1, 128, 128)
-        bwz = torch.cat((bwz, gray_xx), 1)
-        y_ = yy
+        bwz = torch.cat((bwz, gray_x[counter]), 1)
+        y_ = y[counter]
+        counter += 1
       else:
         y_.sample_()
       D_fake = GD(bwz if config['colorization'] else z_,
