@@ -152,7 +152,7 @@ def run(config):
   if config['colorization']:
     for fixed_x, fixed_y in loaders[0]:
       break
-     fixed_x = 0.3 * fixed_x[:, 0, :, :] + \
+    fixed_x = 0.3 * fixed_x[:, 0, :, :] + \
                0.59 * fixed_x[:, 1, :, :] + \
                0.11 * fixed_x[:, 2, :, :]
     fixed_z = fixed_z.view(-1, 1, 128, 128)
